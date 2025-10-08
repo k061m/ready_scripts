@@ -59,10 +59,10 @@ echo ""
 echo -e "${GREEN}✓ Configuration complete!${NC}\n"
 
 echo -e "${BLUE}Your settings:${NC}"
-echo "  Domain: ${GREEN}${subdomain}.${domain}${NC}"
-echo "  Timezone: ${GREEN}${timezone}${NC}"
+echo -e "  Domain: ${GREEN}${subdomain}.${domain}${NC}"
+echo -e "  Timezone: ${GREEN}${timezone}${NC}"
 if [ ! -z "$folder_id" ]; then
-    echo "  Google Drive Folder: ${GREEN}${folder_id}${NC}"
+    echo -e "  Google Drive Folder: ${GREEN}${folder_id}${NC}"
 fi
 
 echo ""
