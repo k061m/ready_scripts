@@ -49,10 +49,17 @@ print_info() {
 check_prerequisites() {
     print_header "Checking Prerequisites"
     
-    # Check if n8n is running
-    if ! docker ps | grep -q n8n; then
+    # Check if n8n is running (handle docker permissions)
+    if docker ps &>/dev/null; then
+        DOCKER_CMD="docker"
+    else
+        DOCKER_CMD="sg docker -c docker"
+    fi
+    
+    if ! eval "$DOCKER_CMD ps" | grep -q n8n; then
         print_error "n8n container is not running!"
         print_info "Start n8n with: cd ~/n8n && docker compose up -d"
+        print_info "Or with: cd ~/n8n && sg docker -c 'docker compose up -d'"
         exit 1
     fi
     
@@ -140,6 +147,13 @@ import_workflows() {
     IMPORTED=0
     FAILED=0
     
+    # Determine docker command to use
+    if docker ps &>/dev/null; then
+        DOCKER_CMD="docker"
+    else
+        DOCKER_CMD="sg docker -c docker"
+    fi
+    
     # Find all JSON files recursively
     while IFS= read -r workflow_file; do
         filename=$(basename "$workflow_file")
@@ -153,9 +167,9 @@ import_workflows() {
         fi
         
         # Copy file into container
-        if docker cp "$workflow_file" n8n:/tmp/workflow-import.json; then
+        if eval "$DOCKER_CMD cp '$workflow_file' n8n:/tmp/workflow-import.json"; then
             # Import using n8n CLI
-            if docker exec n8n n8n import:workflow --input=/tmp/workflow-import.json 2>/dev/null; then
+            if eval "$DOCKER_CMD exec n8n n8n import:workflow --input=/tmp/workflow-import.json" 2>/dev/null; then
                 print_success "Imported: $filename"
                 ((IMPORTED++))
             else
@@ -194,7 +208,12 @@ restart_n8n() {
     print_header "Restarting n8n"
     
     cd "$N8N_DIR"
-    docker compose restart
+    
+    if docker ps &>/dev/null; then
+        docker compose restart
+    else
+        sg docker -c "docker compose restart"
+    fi
     
     sleep 5
     
