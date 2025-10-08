@@ -46,8 +46,14 @@ echo ""
 read -p "Enter Google Drive Folder ID (or leave empty to skip): " folder_id
 sed -i "s/GOOGLE_DRIVE_FOLDER_ID=\".*\"/GOOGLE_DRIVE_FOLDER_ID=\"$folder_id\"/" .env
 
-# Make scripts executable
-chmod +x install-n8n.sh import-workflows.sh
+# Make scripts executable (check if they exist first)
+if [ -f "install-n8n.sh" ]; then
+    chmod +x install-n8n.sh
+fi
+
+if [ -f "import-workflows.sh" ]; then
+    chmod +x import-workflows.sh
+fi
 
 echo ""
 echo -e "${GREEN}✓ Configuration complete!${NC}\n"
@@ -66,8 +72,13 @@ echo "  2. Run installation: ${BLUE}./install-n8n.sh${NC}"
 echo "  3. After setup, import workflows: ${BLUE}./import-workflows.sh${NC}"
 echo ""
 
-read -p "Start installation now? (Y/n): " start_now
-if [[ ! $start_now =~ ^[Nn]$ ]]; then
-    echo ""
-    ./install-n8n.sh
+if [ -f "install-n8n.sh" ]; then
+    read -p "Start installation now? (Y/n): " start_now
+    if [[ ! $start_now =~ ^[Nn]$ ]]; then
+        echo ""
+        ./install-n8n.sh
+    fi
+else
+    echo -e "${YELLOW}Note: install-n8n.sh not found in current directory${NC}"
+    echo "Make sure you're running this from the cloned repository"
 fi
