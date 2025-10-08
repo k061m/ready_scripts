@@ -1,17 +1,7 @@
-# Step 11: Create Backup Script
-create_backup_script() {
-    print_header "Step 11: Creating Backup Script"
-    
-    print_info "Creating a backup script for your n8n data"
-    print_info "This script will:"
-    print_info "  - Backup all workflows, credentials, and settings"
-    print_info "  - Store backups in ~/n8n-backups/"
-    print_info "  - Keep only the last 7 backups (auto-cleanup)"
-    echo ""#!/bin/bash
+#!/bin/bash
 
 # n8n Automated Installation Script for Raspberry Pi 5
 # With Docker and Cloudflare Tunnel
-# Domain: devk061.de
 
 set -e  # Exit on any error
 
@@ -22,14 +12,6 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-DOMAIN="devk061.de"
-SUBDOMAIN="n8n"
-FULL_DOMAIN="${SUBDOMAIN}.${DOMAIN}"
-TUNNEL_NAME="n8n-tunnel"
-N8N_DIR="$HOME/n8n"
-TIMEZONE="Europe/Berlin"
-
 # Functions
 print_header() {
     echo -e "\n${BLUE}================================${NC}"
@@ -37,21 +19,61 @@ print_header() {
     echo -e "${BLUE}================================${NC}\n"
 }
 
-print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
+print_success() { echo -e "${GREEN}✓ $1${NC}"; }
+print_error()   { echo -e "${RED}✗ $1${NC}"; }
+print_warning() { echo -e "${YELLOW}⚠ $1${NC}"; }
+print_info()    { echo -e "${BLUE}ℹ $1${NC}"; }
+
+check_root() {
+    if [ "$EUID" -eq 0 ]; then 
+        print_error "Please do not run this script as root or with sudo"
+        exit 1
+    fi
 }
 
-print_error() {
-    echo -e "${RED}✗ $1${NC}"
-}
+# ======================================================
+# USER INPUT SECTION
+# ======================================================
+print_header "n8n Raspberry Pi Setup — Configuration"
 
-print_warning() {
-    echo -e "${YELLOW}⚠ $1${NC}"
-}
+echo ""
+print_info "Please enter the following configuration details:"
+echo ""
 
-print_info() {
-    echo -e "${BLUE}ℹ $1${NC}"
-}
+read -p "🌐 Your domain (e.g., example.com): " DOMAIN
+while [[ -z "$DOMAIN" ]]; do
+    print_error "Domain cannot be empty."
+    read -p "🌐 Your domain (e.g., example.com): " DOMAIN
+done
+
+read -p "🔹 Subdomain for n8n (e.g., n8n): " SUBDOMAIN
+SUBDOMAIN=${SUBDOMAIN:-n8n}
+
+FULL_DOMAIN="${SUBDOMAIN}.${DOMAIN}"
+
+read -p "🕓 Timezone (default: Europe/Berlin): " TIMEZONE
+TIMEZONE=${TIMEZONE:-Europe/Berlin}
+
+read -p "🔒 Cloudflare Tunnel name (default: n8n-tunnel): " TUNNEL_NAME
+TUNNEL_NAME=${TUNNEL_NAME:-n8n-tunnel}
+
+N8N_DIR="$HOME/n8n"
+
+print_header "Configuration Summary"
+echo -e "${BLUE}Domain:        ${GREEN}$DOMAIN${NC}"
+echo -e "${BLUE}Subdomain:     ${GREEN}$SUBDOMAIN${NC}"
+echo -e "${BLUE}Full Domain:   ${GREEN}$FULL_DOMAIN${NC}"
+echo -e "${BLUE}Tunnel Name:   ${GREEN}$TUNNEL_NAME${NC}"
+echo -e "${BLUE}Timezone:      ${GREEN}$TIMEZONE${NC}"
+echo -e "${BLUE}n8n Directory: ${GREEN}$N8N_DIR${NC}"
+echo ""
+read -p "Press Enter to confirm and continue, or Ctrl+C to cancel..."
+echo ""
+
+# ======================================================
+# CONTINUE WITH YOUR EXISTING FUNCTIONS BELOW
+# ======================================================
+
 
 check_root() {
     if [ "$EUID" -eq 0 ]; then 
