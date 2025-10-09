@@ -588,7 +588,7 @@ print_summary() {
     echo ""
     
     echo -e "${BLUE}📊 System Status:${NC}"
-    echo -e "   n8n Status:    $(docker ps --filter name=n8n --format '{{.Status}}')"
+    echo -e "   n8n Status:    $(sudo docker ps --filter name=n8n --format '{{.Status}}')"
     echo -e "   Tunnel Status: $(sudo systemctl is-active cloudflared)"
     echo ""
     
