@@ -176,6 +176,7 @@ services:
       - N8N_EMAIL_MODE=smtp
       - N8N_METRICS=false
       - N8N_USER_MANAGEMENT_DISABLED=false
+      - N8N_FILE_ACCESS_PATHS=/home/node/.n8n/backups
     volumes:
       - ./data:/home/node/.n8n
     networks:
