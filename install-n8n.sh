@@ -177,6 +177,13 @@ services:
       - N8N_METRICS=false
       - N8N_USER_MANAGEMENT_DISABLED=false
       - N8N_FILE_ACCESS_PATHS=/home/node/.n8n/backups
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168  # hours (7 days)
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+      - EXECUTIONS_DATA_PRUNE_TIMEOUT=3600
+      - N8N_ENCRYPTION_KEY=QPwMKA7gz3tIsSWcEiZRmpG9IkDOjsUIETOXA+lWPBQ=
     volumes:
       - ./data:/home/node/.n8n
     networks:
